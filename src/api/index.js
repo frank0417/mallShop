@@ -31,8 +31,11 @@ export const message = (params) => {
   return axios.get('message/getMessagePage?pageNum='+params.pageNum+'&pageSize='+params.pageSize).then(res => res.data);
 }
 //top
-
 export const getTop = () => {
   return axios.get('/product/getTop').then(res => res.data);
+}
+//抢购商品
+export const productPage = (parames) => {
+  return axios.get('/product/getProductPage?pageNumber='+parames).then(res => res.data);
 }
 

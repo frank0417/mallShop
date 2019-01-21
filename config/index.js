@@ -14,7 +14,7 @@ module.exports = {
 
     // Various Dev Server settings
     host: '127.0.0.1', // can be overwritten by process.env.HOST
-    // host: '192.168.1.102', // can be overwritten by process.env.HOST
+    // host: '192.168.1.101', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
@@ -48,7 +48,7 @@ module.exports = {
     productionGzip: false,
     productionGzipExtensions: ['js', 'css'],
 
-   
+
     bundleAnalyzerReport: process.env.npm_config_report
   }
 }

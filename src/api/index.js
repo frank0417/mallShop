@@ -1,6 +1,5 @@
 import axios from "axios";
-
-let baseUrl = 'http://127.0.0.1/api/';
+import { baseUrl } from "@/api/env.js";
 axios.defaults.baseURL = baseUrl;
 
 var instance = axios.create({

@@ -11,6 +11,7 @@ export default {
 </script>
 
 <style>
-#app {
+img{
+  vertical-align: text-top;
 }
 </style>

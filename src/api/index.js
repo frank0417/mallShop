@@ -35,6 +35,9 @@ export const getTop = () => {
 }
 //抢购商品
 export const productPage = (parames) => {
-  return axios.get('/product/getProductPage?pageNumber='+parames).then(res => res.data);
+  return axios.get('/product/getProductPage?pageNum='+parames.pageNum+'&pageSize='+parames.pageSize).then(res => res.data);
 }
-
+//新人红包接口
+export const newRedEnvelope = () => {
+  return axios.get('/coupon/getNewUserCoupon').then(res => res.data);
+}

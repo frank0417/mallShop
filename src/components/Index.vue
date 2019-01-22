@@ -1,11 +1,10 @@
 
 <template>
 <div class="index">
-    <!-- :loadState="loadState" -->
   <Loadmore
             @reachBottom="reach"
             :limit = "20"
-            :loadState="loadState"
+            :loadState="productPageQuery.loadState"
         >
            <!-- test -->
   <!-- <a href="https://t.asczwa.com/taobao?backurl=https://s.click.taobao.com/kjYkDHw">淘宝</a> -->
@@ -94,7 +93,6 @@
         :startTime="item.startTime"
         :endTime="item.endTime"
         :sale="item.sales"
-        @click_details="navigate"
         ></Recommend>
 
        </article>
@@ -106,10 +104,18 @@
             :limit = "20"
             :text=[]
           >
-          <div v-for="item in messageData.list" :key="item.id" class="message_info">
-            <p>{{item.createDate}}</p>
-            <p>{{item.message}}</p>
-          </div>
+          <article>
+            <div v-for="item in messageData.list" :key="item.id" class="message_info">
+              <aside class="message_icon">
+                <img src="../assets/image/money.png" alt="">
+              </aside>
+              <aside class="message_wrap">
+                <article class="message_title">系统消息</article>
+                <article class="message_contain">{{item.message}}</article>
+                <article class="message_time">{{item.createDate | filterDate}}</article>
+              </aside>
+            </div>
+          </article>
         </Loadmore>
       </article>
       </article>
@@ -117,7 +123,7 @@
 </template>
 
 <script>
- import {swiper,redPacket,message,getTop,productPage} from '../api/index'
+ import {swiper,redPacket,message,getTop,productPage,newRedEnvelope} from '../api/index'
  import { slider, slideritem } from 'vue-concise-slider';
  import Recommend from './recommend'
  import Loadmore from './loadeMore'
@@ -135,7 +141,7 @@ data () {
     swiperList:[],
     redPacketData: {},
     messageData:{},
-    productPageData:{},
+    productPageData:[],
     topList: [],
     top1:{},
     top2:{},
@@ -145,25 +151,41 @@ data () {
       currentPage: 0,
       autoplay:3500,
       loop:true,
-    },
-    loadState:0,
+    }, // swiper参数
     hideMask: false,
     copy:'',
-    pageNumber:2,
+    productPageQuery: {
+      pageNum:1,
+      pageSize:2,
+      loading: false, //上拉加载
+      totalPage:1,
+      loadState:0, // 上拉加载
+      lastPage:false
+    },// 主播推荐
+
   }
+},
+filters:{
+    filterDate(val){
+      let m = val.split("-")[1],
+          d = val.split("-")[2].substring(0,2);
+      let month = parseInt(m),
+      day = parseInt(d);
+        return (month+'月'+day+'日');
+    }
 },
 created(){
   this.getSwiper();
   this.getRedPacket();
   this.getMessage();
   this.getTopProduct();
-  this.getProductPage();
+  this.getProductPage(1,2);
+  this.getNewRedEnvelope();
 
   setInterval(()=>{
     this.getRedPacket();
     this.getMessage();
     this.getTopProduct();
-    this.getProductPage();
   },60000)
   setInterval(()=>{
     this.getSwiper();
@@ -174,27 +196,45 @@ methods: {
       window.location.href='https://t.asczwa.com/taobao?backurl=https://m.tb.cn/h.3tSFOgH?sm=2af62e'
       console.log('复制成功！')
       console.log(e)
-
-
     },
     onError: function (e) {
       console.log('复制失败！')
     },
 
   reach(){
-    console.log('111')
+    if (this.productPageQuery.loading) {
+      return
+    }else {
+        this.productPageQuery.loading = true;
+        if (this.productPageQuery.pageNum>this.productPageQuery.totalPage) {
+            this.productPageQuery.loadState = 1;
+            return;
+        }
+      this.getProductPage(this.productPageQuery.pageNum,this.productPageQuery.pageSize);
+    }
   },
   reachMessage(){
-
+    console.log('messageReach')
+  },
+  // 新人红包
+  getNewRedEnvelope(){
+    newRedEnvelope().then(res=>{
+          if(res.code == 200){
+            // 如果返回的code有值的化弹出红包弹出层
+            //     "data": {
+            // "code": "￥VdQLbJTU5y7￥",
+            // "name": "优惠券",
+            // "active": false,
+            // "id": 5,
+            // "promotionId": null
+            // }
+          }
+        })
   },
   // 抢购商品
   message(){
     // this.getMessage();
     this.hideMask = true;
-  },
-  navigate(){
-    console.log('111')
-    window.location.href='https://www.baidu.com/'
   },
   /**
   start:开始时间
@@ -232,30 +272,35 @@ methods: {
     }
   },
   // 抢购商品
-  getProductPage(){
-      let that = this;
-    productPage({pageNumber:this.pageNumber}).then(res=>{
-      console.log(res)
+  getProductPage(pageNum,pageSize){
+      let that = this,
+      parames = { pageNum, pageSize };
+    productPage(parames).then(res=>{
           if(res.code == 200){
-      this.productPageData = res.data.list
             res.data.list.forEach(el => {
-            let status = this.getTimeRec(el.startTime,el.endTime,el.isMarketable);
+              let status = that.getTimeRec(el.startTime,el.endTime,el.isMarketable);
               that.$set(el,'status', status)
             });
+              if(that.productPageQuery.pageNum == 1){
+                that.productPageData = res.data.list
+                that.productPageQuery.totalPage =res.data.totalPage;
+                if (res.data.totalPage == 1) {
+                  this.productPageQuery.loadState = 1
+                }
+              }else{
+                that.productPageData = [].concat(that.productPageData,res.data.list)
+              }
+              that.productPageQuery.pageNum +=1;
+              that.productPageQuery.loading = false;
           }
         })
   },
   getTopProduct(){
-    // let that = this;
     getTop().then(res=>{
       if(res.code == 200){
         this.top1 = res.data.list[0];
         this.top2 = res.data.list[1];
         this.top3 = res.data.list[2];
-        // res.data.list.forEach(el => {
-        // let status = this.getTimeRec(el.startTime,el.endTime,el.isMarketable);
-        //   that.$set(el,'status', status)
-        // });
       }
     })
   },
@@ -302,33 +347,61 @@ methods: {
   .message{
     box-sizing: border-box;
     height: 80vh;
-    width: 80%;
-    background-color: #fff;
+    width: 73%;
+    border-radius: 0.2rem;
+    background-color: #f7f7f7;
     z-index: 100;
-    padding: 0.4rem 0.2rem;
-    position: absolute;
+    padding: 0.15rem 0.1rem;
+    position: fixed;
     top:50%;
     left: 50%;
     transform: translate(-50%,-50%);
   }
   .message_info{
-    background-color: #eee;
-    color:#181818;
-    margin: 0.1rem 0;
-    border-radius: 10px;
-  }
-  .message_info:first-of-type{
-    margin-top: 0.5rem;
-  }
-  .message_info p:first-of-type{
-    margin-bottom: 0.05rem;
-  }
-  .message p{
     box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 0.2rem;
+    margin: 0.15rem;
+    position: relative;
+    height: 1.5rem;
+  }
+  .message_icon{
+    height: 1rem;
+    width: 1rem;
+    position: absolute;
+    top:50%;
+    left: 0.2rem;
+    transform: translateY(-50%);
+  }
+  .message_icon img{
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+  }
+  .message_wrap .message_title{
+    color: #333333;
+    font-size: 0.32rem;
+    position: absolute;
+    top:0.4rem;
+    left: 1.47rem;
+  }
+  .message_wrap .message_contain{
+    color: #999999;
     font-size: 0.24rem;
-    height: 0.48rem;
-    line-height: 0.48rem;
-    padding: 0 0.2rem;
+    position: absolute;
+    left: 1.47rem;
+    top:0.9rem;
+    width: 3.5rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap
+  }
+  .message_wrap .message_time{
+    color: #cccccc;
+    font-size: 0.22rem;
+    position: absolute;
+    top:0.3rem;
+    right: 0.2rem;
   }
   .mask {
   position: fixed;

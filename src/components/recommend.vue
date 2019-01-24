@@ -41,7 +41,7 @@
           price: {},
           startTime:{},
           endTime: {},
-          sale: {}
+          sale: {},
            
         },
         name: "recommend",

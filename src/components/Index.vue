@@ -2,35 +2,31 @@
 <template>
 <div class="index">
   <Loadmore
-            @reachBottom="reach"
-            :limit = "20"
-            :loadState="productPageQuery.loadState"
-        >
-           <!-- test -->
-  <!-- <a href="https://t.asczwa.com/taobao?backurl=https://s.click.taobao.com/kjYkDHw">淘宝</a> -->
-
-  <!-- <div class="yeluosen">
-    <button type="button"
-     v-clipboard:copy="message"
-     v-clipboard:success="onCopy"
-     v-clipboard:error="onError">复制</button>
-  </div> -->
-
+    @reachBottom="reach"
+    :limit = "20"
+    :loadState="productPageQuery.loadState"
+  >
       <header class="header">
+        <div class="header_wrap">
           <a class="red_packet" :class="redPacketData && redPacketData.active?'ballon':''"></a>
           <a class="header_header"></a>
           <div class="clock" @click="message"></div>
-        </header>
+        </div>
+      </header>
         <article class="swiper">
           <slider ref="slider" :options="options">
               <slideritem v-for="(item,index) in swiperList" :key="index" :style="item.style">
-                  <img :src="item.thumbnail" alt=""  @click="swiperJump(item.url)" style="width: 100%">
+                  <img :src="item.thumbnail" alt=""  @click="swiperJump(item.url)" style="width: 100%;height: 100%;">
               </slideritem>
           </slider>
        </article>
        <!-- 爆款排行 -->
        <article class="hot_sall">
-        <aside class="nav nav_hot_sell"></aside>
+        <aside class="nav_hot_sall flex">
+          <aside class="nav_left nav_margin_left"></aside>
+          <aside class="nav_middle"></aside>
+          <aside class="nav_left nav_margin_right"></aside>
+        </aside>
         <aside class="hot_sall_main">
           <aside class="left">
            <div class="hot_sall_top1">
@@ -74,6 +70,16 @@
           </aside>
         </aside>
        </article>
+
+       <aside class="nav_hot_grab">
+          <aside class="hot_grab_left">
+            <img src="../../static/image/rounded_rectangle.png" alt="">
+            <span>大家都在抢</span>
+          </aside>
+          <aside class="hot_grab_right">
+              <span>1,0979,38</span><span>次实时领券</span>
+          </aside>
+      </aside>
        <!-- 主播推荐 -->
 
        <article class="recommed">
@@ -84,7 +90,6 @@
         v-clipboard:copy="item.code"
         v-clipboard:success="onCopy"
         v-clipboard:error="onError"
-
         :img="item.thumbnail_temp"
         :title="item.name"
         :marketPrice="item.marketPrice"
@@ -111,14 +116,21 @@
               </aside>
               <aside class="message_wrap">
                 <article class="message_title">系统消息</article>
-                <article class="message_contain">{{item.message}}</article>
+                <article class="message_contain">{{item.content}}</article>
                 <article class="message_time">{{item.createDate | filterDate}}</article>
               </aside>
             </div>
           </article>
         </Loadmore>
       </article>
+    </article>
+    <!-- 首次下载领福利 -->
+    <article class="mask" v-show="hideMaskRed" @click="hideMaskRed = false">
+      <article class="first_red_wrap">
+        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="navigator('new',new_red_code)">
+        <img src="../../static/image/close.png" alt="" class="first_close">
       </article>
+    </article>
 </div>
 </template>
 
@@ -156,13 +168,14 @@ data () {
     copy:'',
     productPageQuery: {
       pageNum:1,
-      pageSize:2,
+      pageSize:10,
       loading: false, //上拉加载
       totalPage:1,
       loadState:0, // 上拉加载
       lastPage:false
     },// 主播推荐
-
+    hideMaskRed:false,// 首次领红包
+    new_red_code:'',
   }
 },
 filters:{
@@ -179,7 +192,7 @@ created(){
   this.getRedPacket();
   this.getMessage();
   this.getTopProduct();
-  this.getProductPage(1,2);
+  this.getProductPage(1,10);
   this.getNewRedEnvelope();
 
   setInterval(()=>{
@@ -192,8 +205,13 @@ created(){
   },300000)
 },
 methods: {
+  navigator(type,val){
+    // if(type =='new'){
+    //   this.hideMaskRed = false
+    // }
+  },
     onCopy: function (e) {
-      window.location.href='https://t.asczwa.com/taobao?backurl=https://m.tb.cn/h.3tSFOgH?sm=2af62e'
+      // window.location.href='https://t.asczwa.com/taobao?backurl=https://m.tb.cn/h.3tSFOgH?sm=2af62e'
       console.log('复制成功！')
       console.log(e)
     },
@@ -220,6 +238,10 @@ methods: {
   getNewRedEnvelope(){
     newRedEnvelope().then(res=>{
           if(res.code == 200){
+            if(res.data&&res.data.code){
+              this.hideMaskRed = true
+              this.new_red_code = res.data.code
+            }
             // 如果返回的code有值的化弹出红包弹出层
             //     "data": {
             // "code": "￥VdQLbJTU5y7￥",
@@ -344,6 +366,26 @@ methods: {
   }
 </style>
 <style scoped>
+  .first_red{
+    width: 70%;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+  .first_close{
+    position: absolute;
+    left: 50%;
+    top:78%;
+    transform: translateX(-50%);
+    width: 0.6rem;
+   height: 0.6rem;
+  }
+  .flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .message{
     box-sizing: border-box;
     height: 80vh;
@@ -415,18 +457,27 @@ methods: {
 }
 .top2_right{
   position: relative;
+  margin-right: 0.15rem;
 }
 .header {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.24rem 0.2rem;
+  height: 0.88rem;
+  background:url('../assets/image/header_bac.png') no-repeat;
+  background-size:100% 0.9rem;
+  position: relative;
+}
+.header_wrap{
   display: flex;
   justify-content:space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.2rem;
 }
 .header .red_packet{
-  width: 0.38rem;
-  height: 0.52rem;
-  background: url("../assets/image/hongbao.png") no-repeat center/contain;
+  width: 0.45rem;
+  height: 0.46rem;
+  background:url("../assets/image/hongbao.png") no-repeat center/contain;
 }
 .header_header{
   width: 2.58rem;
@@ -434,8 +485,8 @@ methods: {
   background: url("../assets/image/logo.png") no-repeat center/contain;
 }
 .clock{
-  width: 0.4rem;
-  height: 0.42rem;
+  width: 0.61rem;
+  height: 0.54rem;
   background: url("../assets/image/xitongxiaoxi.png") no-repeat center/contain;
 }
 .swiper{
@@ -446,14 +497,26 @@ methods: {
 .hot_sall{
   box-sizing: border-box;
   width: 100%;
-  padding: 0.1rem 0.2rem 0 0.2rem;
+  padding: 0.05rem 0.2rem 0 0.2rem;
 }
-.nav{
-  width: 6.95rem;
-  height: 1.06rem;
+.nav_hot_sall{
+  height: 0.9rem;
 }
-.nav_hot_sell{
-background: url("../assets/image/baokuan.png") no-repeat center/contain;
+.nav_left{
+  width: 0.88rem;
+  height: 0.03rem;
+}
+.nav_margin_left{
+  background: url('../assets/image/baokuan_left.png') no-repeat center/contain;
+}
+.nav_margin_right{
+  background: url('../assets/image/baokuan_right.png') no-repeat center/contain;
+}
+.nav_middle{
+  width: 3.19rem;
+  height: 0.44rem;
+  background: url("../assets/image/baokuan.png") no-repeat center/contain;
+  margin: 0 0.45rem;
 }
 .hot_sall_main{
  width: 7.1rem;
@@ -491,9 +554,12 @@ width: 2.59rem;
 .rush_buy{
 margin-top: 0.1rem;
 width: 1.27rem;
+min-width: 68px;
 height: 0.32rem;
+min-height: 15px;
 background-color:transparent;
-background:url('../assets/image/lijigoumaim.png') no-repeat center/contain;
+background:url('../assets/image/lijigoumaim.png') no-repeat;
+background-size: 100% 100%;
 font:0.18rem MicrosoftYaHei;
 line-height: 0.32rem;
 color: #ffffff;
@@ -527,7 +593,6 @@ justify-content: space-between;
 .right .common{
   width: 100%;
   box-sizing: border-box;
-  padding-left: 0.23rem;
   padding-right: 0.1rem;
   background-color: #f6f6ff;
   display: flex;
@@ -550,6 +615,37 @@ justify-content: space-between;
   height: 1.78rem;
 }
 /* 主播推荐 */
+.nav_hot_grab{
+  height: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f4f4f4;
+}
+.hot_grab_left{
+  display: flex;
+  align-items: center;
+  margin: 0 0.2rem;
+}
+
+.hot_grab_left img{
+  width: 0.08rem;
+  height: 0.4rem;
+  margin-right: 0.2rem;
+}
+.hot_grab_left span{
+  color: #333333;
+  font-size: 0.36rem;
+}
+.hot_grab_right{
+  color: #e01212;
+  font-size: 0.3rem;
+  margin-right: 0.2rem;
+}
+.hot_grab_right span:last-of-type{
+  color: #666666;
+}
 .recommed{
   box-sizing: border-box;
   width: 100%;

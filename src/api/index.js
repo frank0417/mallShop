@@ -1,5 +1,8 @@
 import axios from "axios";
 import { baseUrl } from "@/api/env.js";
+// import router from "@/router";
+import Vue from "vue";
+
 axios.defaults.baseURL = baseUrl;
 
 var instance = axios.create({
@@ -7,13 +10,13 @@ var instance = axios.create({
   timeout: 1000,
 });
 
-instance.interceptors.request.use(function (config) {
-  // let token = localStorage.getItem('token')
-  let token ="123456"
-  if (token) {
-    config.headers['token'] = token
-  }
-  return config
+axios.interceptors.request.use(
+  function (config) {
+    let token = localStorage.getItem("myToken");
+    if (token) {
+      config.headers["token"] = token;
+    }
+    return config
 }, function (error) {
   return Promise.reject(error)
 })

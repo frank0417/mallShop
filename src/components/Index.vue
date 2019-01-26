@@ -8,7 +8,12 @@
   >
       <header class="header">
         <div class="header_wrap">
-          <a class="red_packet" :class="redPacketData && redPacketData.active?'ballon':''"></a>
+          <a class="red_packet" :class="redPacketData && redPacketData.active?'ballon':''"
+          v-clipboard:copy="redPacketData.code"
+          v-clipboard:success="onCopy"
+          v-clipboard:error="onError"
+          @click="url=redPacketData.url"
+          ></a>
           <a class="header_header"></a>
           <div class="clock" @click="message"></div>
         </div>
@@ -28,7 +33,12 @@
           <aside class="nav_left nav_margin_right"></aside>
         </aside>
         <aside class="hot_sall_main">
-          <aside class="left">
+          <aside class="left"
+          v-clipboard:copy="top1.code"
+          v-clipboard:success="onCopy"
+          v-clipboard:error="onError"
+          @click="url=top1.url"
+          >
            <div class="hot_sall_top1">
               <article class="top1">{{top1.name?top1.name:''}}</article>
               <article class="capacity">{{top1.caption}}</article>
@@ -41,7 +51,12 @@
             </figure>
           </aside>
           <aside class="right">
-            <aside class="top2 common">
+            <aside class="top2 common"
+            v-clipboard:copy="top2.code"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+            @click="url=top2.url"
+            >
                 <aside class="top2_left">
                   <article class="top1">{{top2.name?top2.name:''}}</article>
                   <article class="capacity">{{top2.caption}}</article>
@@ -54,7 +69,12 @@
                     <img :src="top2.thumbnail_temp" alt="" class="top2_img">
                 </figure>
             </aside>
-            <aside class="top3 common">
+            <aside class="top3 common"
+            v-clipboard:copy="top3.code"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+            @click="url=top3.url"
+            >
                 <aside class="top2_left">
                   <article class="top1" style="margin-top:0.12rem">{{top3.name?top3.name:''}}</article>
                   <article class="capacity" style="margin-top:0rem">{{top3.caption}}</article>
@@ -80,8 +100,7 @@
               <span>1,0979,38</span><span>次实时领券</span>
           </aside>
       </aside>
-       <!-- 主播推荐 -->
-
+       <!-- 大家都在抢 -->
        <article class="recommed">
         <aside class="nav nav_recommend"></aside>
         <Recommend
@@ -90,6 +109,8 @@
         v-clipboard:copy="item.code"
         v-clipboard:success="onCopy"
         v-clipboard:error="onError"
+        :data-clipboard-text="item.code"
+        @click="url=item.url"
         :img="item.thumbnail_temp"
         :title="item.name"
         :marketPrice="item.marketPrice"
@@ -127,7 +148,7 @@
     <!-- 首次下载领福利 -->
     <article class="mask" v-show="hideMaskRed" @click="hideMaskRed = false">
       <article class="first_red_wrap">
-        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="navigator('new',new_red_code)">
+        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="">
         <img src="../../static/image/close.png" alt="" class="first_close">
       </article>
     </article>
@@ -150,6 +171,7 @@ components: {
 },
 data () {
   return {
+    url: '',// 跳转的路径
     swiperList:[],
     redPacketData: {},
     messageData:{},
@@ -188,6 +210,8 @@ filters:{
     }
 },
 created(){
+  let myToken = this.$route.query&&this.$route.query.token?this.$route.query.token:'';
+  localStorage.setItem('myToken', myToken);
   this.getSwiper();
   this.getRedPacket();
   this.getMessage();
@@ -205,13 +229,8 @@ created(){
   },300000)
 },
 methods: {
-  navigator(type,val){
-    // if(type =='new'){
-    //   this.hideMaskRed = false
-    // }
-  },
     onCopy: function (e) {
-      // window.location.href='https://t.asczwa.com/taobao?backurl=https://m.tb.cn/h.3tSFOgH?sm=2af62e'
+      window.location.href= this.url
       console.log('复制成功！')
       console.log(e)
     },

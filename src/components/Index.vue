@@ -104,13 +104,12 @@
        <article class="recommed">
         <aside class="nav nav_recommend"></aside>
         <Recommend
+        @copy="copy2"
         v-for="(item,index) in productPageData"
         :key="index"
-        v-clipboard:copy="item.code"
-        v-clipboard:success="onCopy"
-        v-clipboard:error="onError"
+        :url="item.url"
+        :code="item.code"
         :data-clipboard-text="item.code"
-        @click="url=item.url"
         :img="item.thumbnail_temp"
         :title="item.name"
         :marketPrice="item.marketPrice"
@@ -229,9 +228,16 @@ created(){
   },300000)
 },
 methods: {
+  urlTo(index){
+    this.url= this.productPageData[index].url
+  },
+  copy2(i){
+    this.url = i
+    console.log(i)
+    this.onCopy()
+  },
     onCopy: function (e) {
       window.location.href= this.url
-      console.log('复制成功！')
       console.log(e)
     },
     onError: function (e) {

@@ -1,7 +1,10 @@
 
 <template>
-  <article class="recommend_cont border">
-  <article class="recommend_wrap">
+  <article class="recommend_cont border" @click="bingd(url)">
+  <article class="recommend_wrap"
+  v-clipboard:copy="code"
+  v-clipboard:error="onError"
+  >
     <img :src="img" alt="" class="recommend_img">
     <aside class="recommend_detail">
       <aside>
@@ -42,7 +45,8 @@
           startTime:{},
           endTime: {},
           sale: {},
-           
+           url:{},
+           code:{}
         },
         name: "recommend",
         filters:{
@@ -57,6 +61,20 @@
           }
         },
         methods:{
+          bingd(i){
+            console.log(222)
+            this.$emit('copy',i)
+          },
+            onCopy: function (e) {
+            console.log('复制成功！')
+            // return
+            window.location.href= this.url
+            console.log(e)
+          },
+          onError: function (e) {
+            console.log('复制失败！')
+          },
+
             click_details(){
                 this.$emit('click_details');
             },

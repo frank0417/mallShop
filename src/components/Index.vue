@@ -147,7 +147,7 @@
     <!-- 首次下载领福利 -->
     <article class="mask" v-show="hideMaskRed" @click="hideMaskRed = false">
       <article class="first_red_wrap">
-        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="">
+        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="getRedPacket">
         <img src="../../static/image/close.png" alt="" class="first_close">
       </article>
     </article>

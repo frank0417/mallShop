@@ -145,10 +145,14 @@
       </article>
     </article>
     <!-- 首次下载领福利 -->
-    <article class="mask" v-show="hideMaskRed" @click="hideMaskRed = false">
+    <article class="mask" v-show="hideMaskRed">
       <article class="first_red_wrap">
-        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" @click.stop="getRedPacket()">
-        <img src="../../static/image/close.png" alt="" class="first_close">
+        <img src="../../static/image/first_red_rokect.png" alt="" class="first_red" 
+        v-clipboard:copy="new_red_code"
+        v-clipboard:error="onError"
+        @click="newRead"
+        >
+        <img src="../../static/image/close.png" alt="" class="first_close" @click="hideMaskRed = false">
       </article>
     </article>
 </div>
@@ -197,6 +201,7 @@ data () {
     },// 主播推荐
     hideMaskRed:false,// 首次领红包
     new_red_code:'',
+    new_red_url:'',
   }
 },
 filters:{
@@ -228,8 +233,10 @@ created(){
   },300000)
 },
 methods: {
-  getRedPacket(){
-    
+  newRead(){
+    this.url= this.new_red_url;
+    this.hideMaskRed = false;
+    this.onCopy();
   },
   copy2(i){
     this.url = i
@@ -265,6 +272,7 @@ methods: {
             if(res.data&&res.data.code){
               this.hideMaskRed = true
               this.new_red_code = res.data.code
+              this.new_red_url = res.data.url
             }
             // 如果返回的code有值的化弹出红包弹出层
             //     "data": {

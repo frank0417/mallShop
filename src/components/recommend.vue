@@ -66,8 +66,6 @@
             this.$emit('copy',i)
           },
             onCopy: function (e) {
-            console.log('复制成功！')
-            // return
             window.location.href= this.url
             console.log(e)
           },

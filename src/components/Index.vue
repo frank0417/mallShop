@@ -15,7 +15,7 @@
           @click="url=redPacketData.url"
           ></a>
           <a class="header_header"></a>
-          <div class="clock" @click="message"></div>
+          <div class="clock" @click="hideMask = true"></div>
         </div>
       </header>
         <article class="swiper">
@@ -127,10 +127,10 @@
           <Loadmore
             @reachBottom="reachMessage"
             :limit = "20"
-            :text=[]
+            :loadState="messageQuery.loadState"
           >
           <article>
-            <div v-for="item in messageData.list" :key="item.id" class="message_info">
+            <div v-for="item in messageData" :key="item.id" class="message_info">
               <aside class="message_icon">
                 <img src="../assets/image/money.png" alt="">
               </aside>
@@ -177,7 +177,7 @@ data () {
     url: '',// 跳转的路径
     swiperList:[],
     redPacketData: {},
-    messageData:{},
+    messageData:[],
     productPageData:[],
     topList: [],
     top1:{},
@@ -197,8 +197,14 @@ data () {
       loading: false, //上拉加载
       totalPage:1,
       loadState:0, // 上拉加载
-      lastPage:false
     },// 主播推荐
+    messageQuery: {
+      pageNum:1,
+      pageSize:10,
+      loading: false,
+      totalPage:1,
+      loadState:0,
+    },
     hideMaskRed:false,// 首次领红包
     new_red_code:'',
     new_red_url:'',
@@ -263,6 +269,16 @@ methods: {
     }
   },
   reachMessage(){
+      if (this.messageQuery.loading) {
+      return
+    }else {
+        this.messageQuery.loading = true;
+        if (this.messageQuery.pageNum>this.messageQuery.totalPage) {
+            this.messageQuery.loadState = 1;
+            return;
+        }
+      this.getMessage(this.messageQuery.pageNum,this.messageQuery.pageSize);
+    }
     console.log('messageReach')
   },
   // 新人红包
@@ -274,21 +290,8 @@ methods: {
               this.new_red_code = res.data.code
               this.new_red_url = res.data.url
             }
-            // 如果返回的code有值的化弹出红包弹出层
-            //     "data": {
-            // "code": "￥VdQLbJTU5y7￥",
-            // "name": "优惠券",
-            // "active": false,
-            // "id": 5,
-            // "promotionId": null
-            // }
           }
         })
-  },
-  // 抢购商品
-  message(){
-    // this.getMessage();
-    this.hideMask = true;
   },
   /**
   start:开始时间
@@ -359,9 +362,20 @@ methods: {
     })
   },
   getMessage(){
-    message({pageNum:1,pageSize:10}).then(res=>{
+    let that = this;
+    message({pageNum:this.messageQuery.pageNum,pageSize:this.messageQuery.pageSize}).then(res=>{
       if(res.code == 200){
-        this.messageData = res.data;
+          if(that.messageQuery.pageNum == 1){
+                that.messageData = res.data.list
+                that.messageQuery.totalPage =res.data.totalPage;
+                if (res.data.totalPage == 1) {
+                  this.messageQuery.loadState = 1
+                }
+              }else{
+                that.messageData = [].concat(that.messageData,res.data.list)
+              }
+              that.messageQuery.pageNum +=1;
+              that.messageQuery.loading = false;
       }
     })
   },
@@ -420,7 +434,8 @@ methods: {
   }
   .message{
     box-sizing: border-box;
-    height: 80vh;
+    height: 6.5rem;
+    max-height:6.5rem;
     width: 73%;
     border-radius: 0.2rem;
     background-color: #f7f7f7;

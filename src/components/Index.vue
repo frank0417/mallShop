@@ -114,11 +114,12 @@
         :title="item.name"
         :marketPrice="item.marketPrice"
         :price="item.price"
-        :btn_color="item.status"
+       :isMarketable="item.isMarketable"
         :startTime="item.startTime"
         :endTime="item.endTime"
         :sale="item.sales"
         ></Recommend>
+         <!-- :btn_color="item.status" -->
 
        </article>
   </Loadmore>
@@ -292,51 +293,12 @@ methods: {
           }
         })
   },
-  /**
-  start:开始时间
-  end:结束时间
-  isMarketable:是否上下架
-  */
-  getTimeRec(start,end,isMarketable){
-    let nowTime= Date.parse(new Date());
-    let thisTime = start;
-    thisTime = thisTime.replace(/-/g, '/');
-    let stime = new Date(thisTime);
-    stime = stime.getTime();
-
-    let endTime = end;
-    endTime = endTime.replace(/-/g, '/');
-    let etime = new Date(endTime);
-    etime = etime.getTime();
-
-    if(nowTime<stime){
-      // 当前时间小于开始时间
-      if(isMarketable){
-        return 'start';
-      }else{
-        return 'end'
-      }
-    }else if(nowTime>stime || nowTime==stime && nowTime<etime){
-      // 当前时间>=开始时间
-      if(isMarketable){
-        return 'underway';
-      }else{
-        return 'end'
-      }
-    }else{
-      return 'end'
-    }
-  },
   // 抢购商品
   getProductPage(pageNum,pageSize){
       let that = this,
       parames = { pageNum, pageSize };
     productPage(parames).then(res=>{
           if(res.code == 200){
-            res.data.list.forEach(el => {
-              let status = that.getTimeRec(el.startTime,el.endTime,el.isMarketable);
-              that.$set(el,'status', status)
-            });
               if(that.productPageQuery.pageNum == 1){
                 that.productPageData = res.data.list
                 that.productPageQuery.totalPage =res.data.totalPage;

@@ -35,10 +35,10 @@ import { clearInterval } from 'timers';
 <script>
   export default {
         props:{
-          btn_color:{
-            value:String,
-            default: 'underway'
-          },
+          // btn_color:{
+          //   value:String,
+          //   default: 'underway'
+          // },
           img: {},
           title: {},
           marketPrice:{},
@@ -47,7 +47,8 @@ import { clearInterval } from 'timers';
           endTime: {},
           sale: {},
            url:{},
-           code:{}
+           code:{},
+           isMarketable:{},
         },
         name: "recommend",
         filters:{
@@ -61,6 +62,11 @@ import { clearInterval } from 'timers';
             }
           }
         },
+        data() {
+          return {
+            btn_color:'underway'
+          }
+        },
         methods:{
           bingd(i,btn_color){
             if(btn_color =='start')return;
@@ -72,9 +78,7 @@ import { clearInterval } from 'timers';
           onError: function (e) {
             console.log('复制失败！')
           },
-             // 定时器
-        set_interval(start,end,btn_color){
-          if(btn_color == 'end')return;
+          getTimeRec(start,end,isMarketable){
             let nowTime= Date.parse(new Date());
             let thisTime = start;
             thisTime = thisTime.replace(/-/g, '/');
@@ -85,20 +89,50 @@ import { clearInterval } from 'timers';
             endTime = endTime.replace(/-/g, '/');
             let etime = new Date(endTime);
             etime = etime.getTime();
+
+            if(nowTime<stime){
+              // 当前时间小于开始时间
+              if(isMarketable){
+                this.btn_color = 'start';
+              }else{
+                this.btn_color = 'end';
+              }
+            }else if(nowTime>stime || nowTime==stime && nowTime<etime){
+              // 当前时间>=开始时间
+              if(isMarketable){
+                this.btn_color = 'underway';
+              }else{
+                this.btn_color = 'end';
+              }
+            }else{
+              this.btn_color = 'end';
+            }
+          },
+        },
+        created(){
+          this.getTimeRec(this.startTime,this.endTime,this.isMarketable);
+          
+          if(this.btn_color == 'end')return;
+        
+            var stime = (new Date()).getTime();
+
+            var endTime1 = this.endTime.replace(/-/g, '/');
+             endTime1 = endTime1.replace(/-/g, '/');
+
+            var etime = new Date(endTime1).getTime();
+
           var interval = setInterval(function () {
-            stime++;
+            console.log(stime,etime, 'etimeetime' )
+            stime+=1000;
             if(stime>etime||stime==etime){
+
               this.btn_color = this.btn_color=='start'? 'underway':'end'
               clearInterval(interval);
             }
 
           }.bind(this), 1000)
-        },
-
-        },
-        created(){
-          this.set_interval(this.startTime,this.endTime,this.btn_color);
         }
+        // }
     }
 </script>
 

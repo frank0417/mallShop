@@ -122,7 +122,6 @@ import { clearInterval } from 'timers';
             var etime = new Date(endTime1).getTime();
 
           var interval = setInterval(function () {
-            console.log(stime,etime, 'etimeetime' )
             stime+=1000;
             if(stime>etime||stime==etime){
 

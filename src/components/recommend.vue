@@ -1,6 +1,7 @@
 
+import { clearInterval } from 'timers';
 <template>
-  <article class="recommend_cont border" @click="bingd(url)">
+  <article class="recommend_cont border" @click="bingd(url,btn_color)">
   <article class="recommend_wrap"
   v-clipboard:copy="code"
   v-clipboard:error="onError"
@@ -23,7 +24,7 @@
           <span v-else-if="btn_color == 'start'">{{startTime.substring(11,16)}}开抢</span>
           <span v-else>已售{{sale}}</span>
         </aside>
-          <aside class="shop_btn" :class="btn_color" @click="click_details">{{btn_color | btnFilter}}</aside>
+          <aside class="shop_btn" :class="btn_color">{{btn_color | btnFilter}}</aside>
        </aside>
       </aside>
     </aside>
@@ -61,21 +62,42 @@
           }
         },
         methods:{
-          bingd(i){
-            console.log(222)
+          bingd(i,btn_color){
+            if(btn_color =='start')return;
             this.$emit('copy',i)
           },
             onCopy: function (e) {
             window.location.href= this.url
-            console.log(e)
           },
           onError: function (e) {
             console.log('复制失败！')
           },
+             // 定时器
+        set_interval(start,end,btn_color){
+          if(btn_color == 'end')return;
+            let nowTime= Date.parse(new Date());
+            let thisTime = start;
+            thisTime = thisTime.replace(/-/g, '/');
+            let stime = new Date(thisTime);
+            stime = stime.getTime();
 
-            click_details(){
-                this.$emit('click_details');
-            },
+            let endTime = end;
+            endTime = endTime.replace(/-/g, '/');
+            let etime = new Date(endTime);
+            etime = etime.getTime();
+          var interval = setInterval(function () {
+            stime++;
+            if(stime>etime||stime==etime){
+              this.btn_color = this.btn_color=='start'? 'underway':'end'
+              clearInterval(interval);
+            }
+
+          }.bind(this), 1000)
+        },
+
+        },
+        created(){
+          this.set_interval(this.startTime,this.endTime,this.btn_color);
         }
     }
 </script>
@@ -123,7 +145,7 @@
       color: #222222;
       font-size: 0.32rem;
       width: 100%;
-      height: 0.8rem;
+      /* height: 0.8rem; */
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;

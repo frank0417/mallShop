@@ -279,7 +279,6 @@ methods: {
         }
       this.getMessage(this.messageQuery.pageNum,this.messageQuery.pageSize);
     }
-    console.log('messageReach')
   },
   // 新人红包
   getNewRedEnvelope(){

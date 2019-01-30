@@ -113,19 +113,28 @@ import { clearInterval } from 'timers';
           this.getTimeRec(this.startTime,this.endTime,this.isMarketable);
           
           if(this.btn_color == 'end')return;
-            var stime = (new Date()).getTime();
+            let nowTime= Date.parse(new Date());
+            
+            let start = this.startTime.replace(/-/g, '/');
+            var stime = new Date(start);
+            stime = stime.getTime();
 
             var endTime1 = this.endTime.replace(/-/g, '/');
-             endTime1 = endTime1.replace(/-/g, '/');
-
             var etime = new Date(endTime1).getTime();
 
           var interval = setInterval(function () {
-            stime+=1000;
-            if(stime>etime||stime==etime){
+            nowTime+=1000;
+            if(this.btn_color=='underway'){
+              if(nowTime>etime||nowTime==etime){
+                this.btn_color = 'end';
+                clearInterval(interval);
+              }
+            }else if(this.btn_color=='start'){
+              if(nowTime>stime||nowTime==stime){
+                this.btn_color = 'underway';
+                clearInterval(interval);
+              }
 
-              this.btn_color = this.btn_color=='start'? 'underway':'end'
-              clearInterval(interval);
             }
 
           }.bind(this), 1000)

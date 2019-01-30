@@ -97,7 +97,7 @@ import { clearInterval } from 'timers';
               }else{
                 this.btn_color = 'end';
               }
-            }else if(nowTime>stime || nowTime==stime && nowTime<etime){
+            }else if(nowTime>stime && nowTime<etime){
               // 当前时间>=开始时间
               if(isMarketable){
                 this.btn_color = 'underway';
@@ -113,7 +113,6 @@ import { clearInterval } from 'timers';
           this.getTimeRec(this.startTime,this.endTime,this.isMarketable);
           
           if(this.btn_color == 'end')return;
-        
             var stime = (new Date()).getTime();
 
             var endTime1 = this.endTime.replace(/-/g, '/');
@@ -131,7 +130,6 @@ import { clearInterval } from 'timers';
 
           }.bind(this), 1000)
         }
-        // }
     }
 </script>
 

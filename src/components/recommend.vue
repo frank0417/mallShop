@@ -69,7 +69,7 @@ import { clearInterval } from 'timers';
         },
         methods:{
           bingd(i,btn_color){
-            if(btn_color =='start')return;
+            if(btn_color =='start'||btn_color =='end')return;
             this.$emit('copy',i)
           },
             onCopy: function (e) {
@@ -111,10 +111,10 @@ import { clearInterval } from 'timers';
         },
         created(){
           this.getTimeRec(this.startTime,this.endTime,this.isMarketable);
-          
+
           if(this.btn_color == 'end')return;
             let nowTime= Date.parse(new Date());
-            
+
             let start = this.startTime.replace(/-/g, '/');
             var stime = new Date(start);
             stime = stime.getTime();

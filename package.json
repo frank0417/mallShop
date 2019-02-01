@@ -20,6 +20,7 @@
     "vue-clipboard2": "^0.2.1",
     "vue-concise-slider": "^3.3.8",
     "vue-router": "^3.0.1",
+    "vue-scroller": "^2.2.4",
     "wc-messagebox": "^1.10.1"
   },
   "devDependencies": {

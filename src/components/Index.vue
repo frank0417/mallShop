@@ -1,10 +1,13 @@
 
 <template>
 <div class="index">
+   <pull-refresh :refreshing="isRefreshing" :on-refresh="onRefresh">
   <Loadmore
     @reachBottom="reach"
     :limit = "20"
     :loadState="productPageQuery.loadState"
+    class="z_index"
+    
   >
       <header class="header">
         <div class="header_wrap">
@@ -123,6 +126,7 @@
 
        </article>
   </Loadmore>
+   </pull-refresh>
   <article class="mask" v-show="hideMask" @click="hideMask = false">
       <article  class="message"  @click.stop="">
           <Loadmore
@@ -164,6 +168,7 @@
  import { slider, slideritem } from 'vue-concise-slider';
  import Recommend from './recommend'
  import Loadmore from './loadeMore'
+ import pullRefresh from './pullRefresh'
 
 export default {
 name: 'Index',
@@ -171,10 +176,12 @@ components: {
   slider,
   slideritem,
   Recommend,
-  Loadmore
+  Loadmore,
+  pullRefresh
 },
 data () {
   return {
+    isRefreshing: false,
     url: '',// 跳转的路径
     swiperList:[],
     redPacketData: {},
@@ -240,6 +247,19 @@ created(){
   },300000)
 },
 methods: {
+  onRefresh() {
+        this.isRefreshing = true;
+        this.getSwiper();
+        this.getRedPacket();
+        this.getMessage();
+        this.getTopProduct();
+        this.getProductPage(1,10);
+        this.getNewRedEnvelope();
+        setTimeout(() => {
+          this.isRefreshing = false;
+        }, 3000)
+      
+    },
   newRead(){
     this.url= this.new_red_url;
     this.hideMaskRed = false;
@@ -373,6 +393,9 @@ methods: {
   }
 </style>
 <style scoped>
+.z_index{
+  background-color:#fff;
+}
   .first_red{
     width: 70%;
     position: absolute;

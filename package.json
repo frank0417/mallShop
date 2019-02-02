@@ -16,6 +16,8 @@
     "axios": "^0.18.0",
     "callapp-lib": "^2.0.1",
     "element-ui": "^2.4.11",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
     "vue": "^2.5.2",
     "vue-clipboard2": "^0.2.1",
     "vue-concise-slider": "^3.3.8",

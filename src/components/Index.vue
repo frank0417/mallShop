@@ -1,7 +1,8 @@
 
 <template>
 <div class="index">
-   <pull-refresh :refreshing="isRefreshing" :on-refresh="onRefresh">
+   <!-- <my-scroll ref="myScroll" :on-refresh="onRefresh" :get-scroll-top="getTopF" :scroll-state="scrollState">
+					<div slot="scrollList"> -->
   <Loadmore
     @reachBottom="reach"
     :limit = "20"
@@ -9,7 +10,9 @@
     class="z_index"
     
   >
-      <header class="header">
+   <my-scroll ref="myScroll" :on-refresh="onRefresh" :get-scroll-top="getTopF" :scroll-state="scrollState">
+					<div slot="scrollList">
+      <header class="header" ref="refreshT">
         <div class="header_wrap">
           <a class="red_packet" :class="redPacketData && redPacketData.active?'ballon':''"
           v-clipboard:copy="redPacketData.code"
@@ -125,8 +128,9 @@
          <!-- :btn_color="item.status" -->
 
        </article>
+  		</div>
+		</my-scroll>
   </Loadmore>
-   </pull-refresh>
   <article class="mask" v-show="hideMask" @click="hideMask = false">
       <article  class="message"  @click.stop="">
           <Loadmore
@@ -168,7 +172,7 @@
  import { slider, slideritem } from 'vue-concise-slider';
  import Recommend from './recommend'
  import Loadmore from './loadeMore'
- import pullRefresh from './pullRefresh'
+ import myScroll  from './vue-scroll'
 
 export default {
 name: 'Index',
@@ -177,11 +181,17 @@ components: {
   slideritem,
   Recommend,
   Loadmore,
-  pullRefresh
+  myScroll
 },
 data () {
   return {
-    isRefreshing: false,
+    scrollState: true, //是否可以滑动
+      indexScrollTop:0,
+      listdata:[],
+      listParams:{
+        p:0
+      },
+    // isRefreshing: false,
     url: '',// 跳转的路径
     swiperList:[],
     redPacketData: {},
@@ -227,6 +237,9 @@ filters:{
         return (month+'月'+day+'日');
     }
 },
+mounted () {
+  window.addEventListener('scroll', this.handleScroll,true)
+},
 created(){
   let myToken = this.$route.query&&this.$route.query.token?this.$route.query.token:'';
   localStorage.setItem('myToken', myToken);
@@ -247,19 +260,35 @@ created(){
   },300000)
 },
 methods: {
-  onRefresh() {
-        this.isRefreshing = true;
-        this.getSwiper();
-        this.getRedPacket();
-        this.getMessage();
-        this.getTopProduct();
-        this.getProductPage(1,10);
-        this.getNewRedEnvelope();
-        setTimeout(() => {
-          this.isRefreshing = false;
-        }, 3000)
-      
-    },
+
+handleScroll () {
+  let topTemp = this.$refs.myScroll;
+},
+  onRefresh(mun) { // 刷新
+          this.listParams.p = 1;
+          this.productPageQuery = {
+            pageNum:1,
+            pageSize:10,
+            loading: false,
+            totalPage:1,
+            loadState:0,
+          }
+            this.getSwiper();
+            this.getRedPacket();
+            this.getMessage();
+            this.getTopProduct();
+            this.getProductPage(this.productPageQuery.pageNum,this.productPageQuery.pageSize);
+            this.getNewRedEnvelope();
+          setTimeout(() => {
+          this.listParams.p++;
+                        this.$refs.myScroll.setState(3);
+        }, 2000)
+
+        },
+        getTopF(y) {//滚动条位置
+            this.indexScrollTop = y;
+            console.log(y)
+        },
   newRead(){
     this.url= this.new_red_url;
     this.hideMaskRed = false;
@@ -319,6 +348,7 @@ methods: {
       parames = { pageNum, pageSize };
     productPage(parames).then(res=>{
           if(res.code == 200){
+            
               if(that.productPageQuery.pageNum == 1){
                 that.productPageData = res.data.list
                 that.productPageQuery.totalPage =res.data.totalPage;

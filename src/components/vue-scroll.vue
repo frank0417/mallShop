@@ -15,7 +15,7 @@
           <i>
             <img :src="Load">
           </i>
-					<br>
+          <br>
           <br>刷新中
         </p>
         <p v-if="state==2">松开刷新</p>
@@ -23,7 +23,7 @@
           <i>
             <img :src="Load">
           </i>
-					<br>
+          <br>
           <br>刷新完成
         </p>
       </div>
@@ -31,11 +31,11 @@
     <!-- top -->
     <div class="scroll-list" :style="{ transform: 'translate3d(0, ' + top + 'px, 0)'}">
       <slot name="scrollList"></slot>
-      <div class="scroll-bottom">
+      <!-- <div class="scroll-bottom">
         <div v-if="state==4">加载中</div>
         <div v-if="state==5">加载完成</div>
         <div v-if="state==7">没有更多</div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -184,7 +184,7 @@ export default {
       //加载回调
       if (this.state != 7) {
         this.state = 4;
-        this.onPull(this.state);
+        // this.onPull(this.state);
       }
     }
   },
@@ -236,19 +236,18 @@ export default {
   flex: 1 0 100%;
   display: block;
   height: 0.4rem;
-	margin-top: 25px;
 }
 .scroll-top div img {
   width: 0.6rem;
 }
 .scroll-top div p {
   flex: 1 0 100%;
-	color:#666;
-	font-size: 12px;
+  color:#666;
+  font-size: 12px;
 }
 .scroll-list {
   overflow: hidden;
-  min-height: 100vh;
+  min-height: 100%;
 }
 .scroll-bottom {
   text-align: center;

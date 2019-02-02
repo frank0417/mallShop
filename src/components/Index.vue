@@ -1,8 +1,6 @@
 
 <template>
 <div class="index">
-   <!-- <my-scroll ref="myScroll" :on-refresh="onRefresh" :get-scroll-top="getTopF" :scroll-state="scrollState">
-					<div slot="scrollList"> -->
   <Loadmore
     @reachBottom="reach"
     :limit = "20"
@@ -125,8 +123,6 @@
         :endTime="item.endTime"
         :sale="item.sales"
         ></Recommend>
-         <!-- :btn_color="item.status" -->
-
        </article>
   		</div>
 		</my-scroll>
@@ -191,7 +187,6 @@ data () {
       listParams:{
         p:0
       },
-    // isRefreshing: false,
     url: '',// 跳转的路径
     swiperList:[],
     redPacketData: {},
@@ -266,28 +261,31 @@ handleScroll () {
 },
   onRefresh(mun) { // 刷新
           this.listParams.p = 1;
-          this.productPageQuery = {
-            pageNum:1,
-            pageSize:10,
-            loading: false,
-            totalPage:1,
-            loadState:0,
-          }
-            this.getSwiper();
-            this.getRedPacket();
-            this.getMessage();
-            this.getTopProduct();
-            this.getProductPage(this.productPageQuery.pageNum,this.productPageQuery.pageSize);
-            this.getNewRedEnvelope();
+          history.go(0) 
+          // this.productPageQuery = {
+          //   pageNum:1,
+          //   pageSize:10,
+          //   loading: false,
+          //   totalPage:1,
+          //   loadState:0,
+          // }
+          // this.swiperList = [];
+          // this.messageData = [];
+          // this.productPageData = [];
+          // this.topList = [];
+          //   this.getSwiper();
+          //   this.getRedPacket();
+          //   this.getMessage();
+          //   this.getTopProduct();
+          //   this.getProductPage(this.productPageQuery.pageNum,this.productPageQuery.pageSize);
+          //   this.getNewRedEnvelope();
           setTimeout(() => {
           this.listParams.p++;
-                        this.$refs.myScroll.setState(3);
-        }, 2000)
-
+          this.$refs.myScroll.setState(3);
+        }, 3000)
         },
         getTopF(y) {//滚动条位置
             this.indexScrollTop = y;
-            console.log(y)
         },
   newRead(){
     this.url= this.new_red_url;
@@ -425,6 +423,7 @@ handleScroll () {
 <style scoped>
 .z_index{
   background-color:#fff;
+  min-height: 100vh;
 }
   .first_red{
     width: 70%;

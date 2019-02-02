@@ -1,6 +1,6 @@
 <template>
 	<div class="load_more" @scroll="reachBottom($event.target)">
-		<slot></slot>
+		<slot style="min-height:100vh"></slot>
 		<div class="load" v-html="text[loadState]"></div>
 	</div>
 </template>
